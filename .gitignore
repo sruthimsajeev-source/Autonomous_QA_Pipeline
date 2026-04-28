@@ -1,0 +1,10 @@
+node_modules/
+dist/
+test-results/
+reports/
+.env
+.env.*
+!.env.example
+ui/node_modules/
+ui/.next/
+ui/tsconfig.tsbuildinfo

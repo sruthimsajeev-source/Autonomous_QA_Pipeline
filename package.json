@@ -1,0 +1,23 @@
+{
+  "name": "autonomous-qa-pipeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "pipeline": "node --loader ts-node/esm src/index.ts run",
+    "test": "playwright test",
+    "test:generated": "playwright test tests/generated/autonomous.spec.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@types/node": "^22.7.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
