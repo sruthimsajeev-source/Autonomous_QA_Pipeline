@@ -1,29 +1,23 @@
 {
-  "name": "ui",
-  "version": "0.1.0",
+  "name": "autonomous-qa-pipeline",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node server.js",
-    "build": "next build",
-    "start": "node server.js",
-    "lint": "eslint"
+    "build": "tsc -p tsconfig.json",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "pipeline": "node --loader ts-node/esm src/index.ts run",
+    "test": "playwright test",
+    "test:generated": "playwright test tests/generated/autonomous.spec.ts"
   },
   "dependencies": {
-    "next": "16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3"
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@playwright/test": "^1.53.0",
+    "@types/node": "^22.7.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }

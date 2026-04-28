@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Autonomous QA Pipeline (Groq + Playwright)
 
-## Getting Started
+This project implements a full autonomous QA pipeline with separate agents:
 
-First, run the development server:
+1. Requirement Reader Agent
+2. Planner Agent -> converts requirement text to JSON test plan
+3. Generator Agent -> creates Playwright `*.spec.ts`
+4. Executor Agent -> runs tests with configurable Playwright workers
+5. Failure Analyzer Agent -> classifies failures into 7 categories
+6. Healer Agent -> heals locator/timing issues and reruns healed tests
+7. Quality Gate Agent -> PASS/FAIL based on healing success
+8. Reporter Agent -> generates premium HTML report at `reports/autonomous-report.html`
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npx playwright install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Create `.env` from `.env.example`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+GROQ_API_KEY=your_real_key
+BASE_URL=http://localhost:3000
+PLAYWRIGHT_WORKERS=4
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Run
 
-## Learn More
+```bash
+npm run pipeline -- --requirement=requirements.txt --baseUrl=http://localhost:3000 --workers=4
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Outputs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Generated test plan JSON: `reports/generated-test-plan.json`
+- Generated spec: `tests/generated/autonomous.spec.ts`
+- Playwright result JSON: `reports/playwright-results.json`
+- Premium autonomous report: `reports/autonomous-report.html`
+- Live state JSON for dashboard: `reports/pipeline-live.json`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Standalone Live UI (Next.js + Socket.IO)
 
-## Deploy on Vercel
+The standalone UI lives in `ui` and streams pipeline updates in real time.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+cd ui
+npm install
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open: `http://localhost:3001`
+
+How it works:
+- `ui/server.js` starts Next.js + Socket.IO
+- Watches `../reports/pipeline-live.json`
+- Pushes `pipeline:update` events to the browser
+
+The UI includes:
+- auto-refreshing live pipeline status
+- animated agent timeline/progress
+- expandable failed-test artifact links (screenshot/video/trace/error-context)
+
+## Notes
+
+- If `GROQ_API_KEY` is not present, planner uses fallback plan.
+- Healer only applies safe auto-fixes for locator/timing categories.
+- Quality gate returns `PASS` only when healed rerun has zero remaining failures and all healable failures were addressed.
